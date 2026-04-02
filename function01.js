@@ -5,8 +5,8 @@
 // 입력 -> 동작 -> 출력
 function add(n1, n2) {
     let result = n1 + n2; 
-    return result;
-
+    return result;  
+    // return -> 함수 결과 반환 & 함수 종료 // return이 없을 때 -> 함수는 항상 반환하는데 return이 없으면 undifined 반환
     // 함수 동작 구현부
 }
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <p id="box">마우스를 올려보세요</p> 
+
+    <script>
+        // mouseover -> 글씨 orange 변경 
+        // mouseout -> 글씨 black 변경
+
+        const box = document.querySelector("#box");
+
+        // 함수를 정의해서 색상만 바꾸기 가능
+
+        function changeColor(color) {
+            box.style.color = color;
+        };
+
+        // 이벤트 리스너는 함수의 반환이 필요없기 때문에 정의만 하면 사용가능함
+        box.addEventListener("mouseover", () => changeColor("orange"));
+        box.addEventListener("mouseout", () => changeColor("black"));
+
+
+        // 요약
+        // 1) () => 형태는 함수다.
+        // 2) addEventListener 두번째 인자는 함수다
+    </script>
+</body>
+
+</html>
