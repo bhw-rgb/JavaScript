@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <input type="text" id="name" placeholder="이름 입력.." autocomplete="off">
+    <button id="save">저장</button>
+    <button id="reset">리셋</button>
+    <p id="result"></p>
+
+    <script>
+       const input = document.querySelector("#name");
+       const saveBtn = document.querySelector("#save");
+       const resetBtn = document.querySelector("#reset");
+       const result = document.querySelector("#result");
+
+        // 저장된 값 불러오기
+       const savedUser = localStorage.getItem("name");
+
+       if (savedUser) {
+        result.textContent = savedUser;
+        }
+
+        // 저장 버튼
+        saveBtn.addEventListener("click", () => {
+            localStorage.setItem("name", input.value);
+            result.textContent = input.value;
+        });
+
+        // 리셋 버튼
+        resetBtn.addEventListener("click", () => {
+            localStorage.removeItem("name");
+            result.textContent = ""; // 화면도 초기화
+});
+    </script>
+</body>
+</html>

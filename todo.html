@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <title>To-do</title>
+</head>
+
+<body class="p-4">
+
+    <div class="container">
+        <h1>To-do List</h1>
+
+        <div class="input-group mb-3">
+            <input type="text" id="todoInput" class="form-control" placeholder="할 일 입력">
+            <button id="addBtn" class="btn btn-primary">추가</button>
+        </div>
+
+        <ul id="todoList" class="list-group"></ul>
+    </div>
+
+    <script>
+        const todoInput = document.getElementById("todoInput");
+        const addBtn = document.getElementById("addBtn");
+        const todoList = document.getElementById("todoList");
+        
+        let todos = [];
+
+        const savedTodos = localStorage.getItem("todos");
+        if (savedTodos) {
+            todos = JSON.parse(savedTodos);
+            renderTodos();
+        }
+        
+        function renderTodos() {
+            todoList.innerHTML = "";
+            todos.forEach(todo => {
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = todo;
+                todoList.appendChild(li);
+            });
+        }
+
+        function addTodo() {
+            const text = todoInput.value.trim();
+
+            if (text === "") {
+                alert("할 일을 입력하세요");
+                return;
+            }
+
+            todos.push(text);
+            localStorage.setItem("todos", JSON.stringify(todos));
+
+            renderTodos();
+            todoInput.value = "";
+        }
+
+        addBtn.addEventListener("click", addTodo);
+
+            todoInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addTodo();
+    });
+
+    </script>
+</body>
+
+</html>

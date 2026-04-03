@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Timer API</h1>
+
+    <button id="start">카운트다운 시작</button>
+    <p id="time"></p>
+
+    <script>
+    const startBtn = document.querySelector("#start");
+    const timeEl = document.querySelector("#time");
+
+    let timeLeft = 10;
+    let timerId = null;
+
+    startBtn.addEventListener("click", () => {
+
+        if (timerId !== null) return;
+
+        timeEl.textContent = timeLeft;
+
+        timerId = setInterval(() => {
+            timeLeft--;
+
+            if (timeLeft === 0) {
+                timeEl.textContent = "종료";
+                clearInterval(timerId);
+                timerId = null;
+                timeLeft = 10;
+            } else {
+                timeEl.textContent = timeLeft;
+            }
+        }, 1000);
+    });
+    </script>
+
+</body>
+
+</html>
+
