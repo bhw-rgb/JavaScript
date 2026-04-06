@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <title>Modern To-do List</title>
+    
+    <style>
+        /* 기본 배경과 폰트 설정 */
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa; /* 아주 연한 회색 배경 */
+        }
+        
+        /* 투두리스트 메인 카드 디자인 */
+        .todo-card {
+            max-width: 480px; /* 화면이 넓어도 카드가 너무 커지지 않게 제한 */
+            margin: 4rem auto; /* 가운데 정렬 및 위쪽 여백 */
+            border-radius: 1.2rem; /* 둥근 모서리 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* 부드러운 그림자 효과 */
+            background-color: white;
+            overflow: hidden;
+        }
+
+        /* 완료된 텍스트 스타일 */
+        .completed-text {
+            text-decoration: line-through;
+            color: #adb5bd;
+        }
+
+        /* 리스트 아이템 디자인 */
+        .list-group-item {
+            border: none;
+            border-bottom: 1px solid #f1f3f5;
+            padding: 1rem 1.25rem;
+            transition: background-color 0.2s ease;
+        }
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        .list-group-item:hover {
+            background-color: #fdfdfe; /* 마우스 올렸을 때 살짝 밝아지는 효과 */
+        }
+
+        /* 체크박스 크기 키우기 */
+        .form-check-input {
+            width: 1.3em;
+            height: 1.3em;
+            cursor: pointer;
+        }
+
+        /* 아이콘 버튼 스타일 */
+        .btn-icon {
+            color: #adb5bd;
+            background: none;
+            border: none;
+            padding: 0.2rem 0.5rem;
+            transition: color 0.2s ease;
+        }
+        .btn-icon:hover {
+            color: #dc3545; /* 마우스 올렸을 때 빨간색으로 변경 */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="todo-card">
+            
+            <div class="p-4 bg-primary text-white">
+                <h2 class="fw-bold mb-4 fs-4">
+                    <i class="bi bi-check2-square me-2"> 나의 할 일 </i>
+                </h2>
+                
+                <div class="input-group">
+                    <input type="text" id="todoInput" class="form-control form-control-lg border-0 shadow-none" placeholder="오늘 할 일은 무엇인가요?">
+                    <button id="addBtn" class="btn btn-dark px-4 fw-bold">추가</button>
+                </div>
+            </div>
+
+            <ul id="todoList" class="list-group list-group-flush">
+                
+            </ul>
+
+            <div id="emptyState" class="text-center p-5 d-none">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <p class="text-muted mt-2 mb-0">모든 할 일을 마쳤습니다!</p>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        const todoInput = document.getElementById("todoInput");
+        const addBtn = document.getElementById("addBtn");
+        const todoList = document.getElementById("todoList");
+        const emptyState = document.getElementById("emptyState");
+        
+        let todos = [];
+
+        // 1. 데이터 불러오기
+        const savedTodos = localStorage.getItem("todos");
+        if (savedTodos) {
+            const parsedTodos = JSON.parse(savedTodos);
+            todos = parsedTodos.map(item => 
+                typeof item === 'string' ? { text: item, completed: false } : item
+            );
+            renderTodos();
+        } else {
+            checkEmptyState();
+        }
+        
+        // 빈 상태 확인 함수
+        function checkEmptyState() {
+            if (todos.length === 0) {
+                emptyState.classList.remove("d-none");
+            } else {
+                emptyState.classList.add("d-none");
+            }
+        }
+
+        // 2. 화면에 그리기
+        function renderTodos() {
+            todoList.innerHTML = "";
+            checkEmptyState();
+
+            todos.forEach((todo, index) => {
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                
+                const leftDiv = document.createElement("div");
+                leftDiv.className = "d-flex align-items-center gap-3"; // 간격 조금 더 넓게
+
+                // 체크박스
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "form-check-input mt-0";
+                checkbox.checked = todo.completed;
+                checkbox.addEventListener("change", () => toggleTodo(index));
+
+                // 텍스트
+                const span = document.createElement("span");
+                span.textContent = todo.text;
+                span.className = "fs-6"; // 글자 크기 약간 조정
+                if (todo.completed) {
+                    span.classList.add("completed-text");
+                }
+
+                leftDiv.appendChild(checkbox);
+                leftDiv.appendChild(span);
+
+                // 삭제 버튼 (아이콘 적용)
+                const deleteBtn = document.createElement("button");
+                deleteBtn.innerHTML = '<i class="bi bi-trash3-fill"></i>'; // 쓰레기통 아이콘
+                deleteBtn.className = "btn-icon";
+                deleteBtn.addEventListener("click", () => deleteTodo(index));
+
+                li.appendChild(leftDiv);
+                li.appendChild(deleteBtn);
+                todoList.appendChild(li);
+            });
+        }
+
+        // 3. 할 일 추가하기
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (text === "") return;
+
+            todos.push({ text: text, completed: false });
+            saveAndRender();
+            todoInput.value = "";
+            todoInput.focus(); // 입력 후 다시 커서 깜빡이게 하기
+        }
+
+        function toggleTodo(index) {
+            todos[index].completed = !todos[index].completed; 
+            saveAndRender();
+        }
+
+        function deleteTodo(index) {
+            todos.splice(index, 1); 
+            saveAndRender();
+        }
+
+        function saveAndRender() {
+            localStorage.setItem("todos", JSON.stringify(todos));
+            renderTodos();
+        }
+
+        addBtn.addEventListener("click", addTodo);
+        todoInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") addTodo();
+        });
+
+    </script>
+</body>
+</html>

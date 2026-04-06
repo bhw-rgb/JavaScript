@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>To-do</title>
+    <style>
+        /* 완료된 항목의 텍스트에 취소선을 긋는 CSS */
+        .completed-text {
+            text-decoration: line-through;
+            color: #adb5bd; /* 회색으로 변경 */
+        }
+    </style>
+</head>
+
+<body class="p-4">
+
+    <div class="container">
+        <h1>To-do List</h1>
+
+        <div class="input-group mb-3">
+            <input type="text" id="todoInput" class="form-control" placeholder="할 일 입력">
+            <button id="addBtn" class="btn btn-primary">추가</button>
+        </div>
+
+        <ul id="todoList" class="list-group"></ul>
+    </div>
+
+    <script>
+        const todoInput = document.getElementById("todoInput");
+        const addBtn = document.getElementById("addBtn");
+        const todoList = document.getElementById("todoList");
+        
+        let todos = [];
+
+        // 1. 데이터 불러오기
+        const savedTodos = localStorage.getItem("todos");
+        if (savedTodos) {
+            const parsedTodos = JSON.parse(savedTodos);
+            // 이전 버전(단순 문자열)과 호환을 위해 객체 형태로 변환
+            todos = parsedTodos.map(item => 
+                typeof item === 'string' ? { text: item, completed: false } : item
+            );
+            renderTodos();
+        }
+        
+        // 2. 화면에 그리기
+        function renderTodos() {
+            todoList.innerHTML = "";
+            todos.forEach((todo, index) => {
+                const li = document.createElement("li");
+                // 요소들을 양끝으로 배치하고 가운데 정렬하는 Bootstrap 클래스 추가
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                
+                // [왼쪽 영역] 체크박스와 텍스트
+                const leftDiv = document.createElement("div");
+                leftDiv.className = "d-flex align-items-center gap-2"; // gap-2로 간격 띄우기
+
+                // ① 완료 체크박스 만들기
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "form-check-input mt-0";
+                checkbox.checked = todo.completed;
+                checkbox.addEventListener("change", () => toggleTodo(index));
+
+                // ② 할 일 텍스트 만들기
+                const span = document.createElement("span");
+                span.textContent = todo.text;
+                if (todo.completed) {
+                    span.className = "completed-text"; // 체크되어 있으면 취소선 클래스 추가
+                }
+
+                leftDiv.appendChild(checkbox);
+                leftDiv.appendChild(span);
+
+                // [오른쪽 영역] ③ 삭제 버튼 만들기
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "삭제";
+                deleteBtn.className = "btn btn-danger btn-sm";
+                deleteBtn.addEventListener("click", () => deleteTodo(index));
+
+                // 조립하기
+                li.appendChild(leftDiv);
+                li.appendChild(deleteBtn);
+                todoList.appendChild(li);
+            });
+        }
+
+        // 3. 할 일 추가하기
+        function addTodo() {
+            const text = todoInput.value.trim();
+
+            if (text === "") {
+                alert("할 일을 입력하세요");
+                return;
+            }
+
+            // [핵심] 문자열 대신 '객체(Object)' 형태로 저장 (글자 + 완료여부)
+            todos.push({ text: text, completed: false });
+            saveAndRender();
+            todoInput.value = "";
+        }
+
+        // 4. 완료 상태 변경하기
+        function toggleTodo(index) {
+            // 현재 상태를 반대로 뒤집기 (true <-> false)
+            todos[index].completed = !todos[index].completed; 
+            saveAndRender();
+        }
+
+        // 5. 할 일 삭제하기
+        function deleteTodo(index) {
+            // 배열에서 해당 위치(index)의 항목 1개 제거
+            todos.splice(index, 1); 
+            saveAndRender();
+        }
+
+        // 6. 데이터 저장 및 화면 갱신 (반복되는 코드 묶기)
+        function saveAndRender() {
+            localStorage.setItem("todos", JSON.stringify(todos));
+            renderTodos();
+        }
+
+        // 이벤트 연결
+        addBtn.addEventListener("click", addTodo);
+        todoInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") addTodo();
+        });
+
+    </script>
+</body>
+</html>
